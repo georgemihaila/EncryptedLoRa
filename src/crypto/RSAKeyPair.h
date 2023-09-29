@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Crypto.h"
+using namespace Crypto;
 
 namespace Crypto
 {
@@ -9,26 +10,12 @@ namespace Crypto
   public:
     String privateKey;
     String publicKey;
-    KeyPair()
-    {
-      privateKey = RSA2048::genPrivateKey();
-      publicKey = RSA2048::derivatePublicKey(privateKey);
-    }
+    RSAKeyPair();
 
-    KeyPair(String privateKey, String publicKey)
-    {
-      this->privateKey = privateKey;
-      this->publicKey = publicKey;
-    }
+    RSAKeyPair(String privateKey, String publicKey);
 
-    String sign(String message)
-    {
-      return RSA2048::sign(message, privateKey);
-    }
+    String sign(String message);
 
-    bool verify(String message)
-    {
-      return strcmp(RSA2048::verify(message, publicKey).c_str(), message.c_str()) == 0;
-    }
-  }
+    bool verify(String message);
+  };
 };

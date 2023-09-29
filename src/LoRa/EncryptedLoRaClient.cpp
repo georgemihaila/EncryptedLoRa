@@ -3,14 +3,19 @@
 #include "EncryptedLoRaClient.h"
 #include "LoRaClient.h"
 
-LoRaWrapper::EncryptedLoRaClient::EncryptedLoRaClient(String deviceID, SPIType spiType)
+LoRaWrapper::EncryptedLoRaClient::EncryptedLoRaClient()
 {
-  _lora = new LoRaWrapper::LoRaClient(433E6, 0x12, spiType);
   _scanning = false;
   _broadcasting = false;
-  _selfID = deviceID;
   _peerCount = 0;
   _peers = new Peer *[MAX_PEERS];
+  _rsaKey = new RSAKeyPair();
+}
+
+LoRaWrapper::EncryptedLoRaClient::EncryptedLoRaClient(String deviceID, SPIType spiType) : EncryptedLoRaClient()
+{
+  _lora = new LoRaWrapper::LoRaClient(433E6, 0x12, spiType);
+  _selfID = deviceID;
   _broadcastTask = new BackgroundTask(
       "BroadcastTask", [&]()
       {
