@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 #include "../../crypto/Crypto.h"
+#include "../../crypto/RSAKeyPair.h"
 
 namespace Data
 {
@@ -20,5 +21,6 @@ namespace Data
     Payload(String action, String method, RSAKeyPair *_key);
     Payload(String action, RSAKeyPair *_key);
     String toJSON();
+    String toUnsignedJSON();
   };
 };

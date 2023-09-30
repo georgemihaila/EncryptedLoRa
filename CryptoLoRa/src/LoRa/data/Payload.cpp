@@ -29,8 +29,13 @@ namespace Data
     return "{\"action\":\"" + action + "\",\"method\":\"" + method + "\",\"params\":\"" + params + "\",\"signature\":\"" + getSignature() + "\"}";
   }
 
+  String Payload::toUnsignedJSON()
+  {
+	return "{\"action\":\"" + action + "\",\"method\":\"" + method + "\",\"params\":\"" + params + "\"}";
+  }
+
   String Payload::getSignature()
   {
-    return _key->sign(this->toJSON());
+    return _key->sign(this->toUnsignedJSON());
   }
 };

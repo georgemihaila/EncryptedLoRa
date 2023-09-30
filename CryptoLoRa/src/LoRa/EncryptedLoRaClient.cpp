@@ -19,7 +19,7 @@ LoRaWrapper::EncryptedLoRaClient::EncryptedLoRaClient(String deviceID, SPIType s
   _logger->info("Instantiating LoRaClient...");
   _lora = new LoRaWrapper::LoRaClient(433E6, 0x12, spiType);
   _selfID = deviceID;
-  _broadcastPackets = Packet::fromPayload(new Payload("broadcast_self", "", _selfID, _rsaKey), _selfID, "*");
+  _broadcastPackets = Packet::fromPayload(new Payload("broadcast_self", "", _selfID, _rsaKey), _selfID, "*", _rsaKey);
   _broadcastTask = new BackgroundTask(
       "BroadcastTask", [&]()
       {

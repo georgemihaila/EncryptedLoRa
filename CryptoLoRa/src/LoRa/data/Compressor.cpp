@@ -1,12 +1,10 @@
 #pragma once
 
-#include "Compression.h"
+#include "Compressor.h"
 
 namespace Data
 {
-  namespace Compression
-  {
-    String Data::Compression::deflate(String message)
+    String Compressor::deflate(String message)
     {
       // Define buffers and their sizes
       uint8_t inBuffer[message.length()];
@@ -32,7 +30,7 @@ namespace Data
     }
 
     // Decompress a given message
-    String Data::Compression::inflate(String message)
+    String Compressor::inflate(String message)
     {
       // Define buffers and their sizes
       uint8_t inBuffer[message.length()];
@@ -52,5 +50,4 @@ namespace Data
       // Convert decompressed buffer to String and return
       return String((char *)outBuffer).substring(0, decompressedSize);
     }
-  };
 };

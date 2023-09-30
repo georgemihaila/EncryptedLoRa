@@ -11,13 +11,14 @@
 #include <iostream>
 #include <string>
 #include "Keys.h"
+#include "Base64.h"
 
 namespace Crypto
 {
-  // public:
   class RSA2048;
   class AES128;
   class SHA256;
   class RSAKeyPair;
+  class Base64;
 };
 #endif

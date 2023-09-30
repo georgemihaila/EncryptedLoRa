@@ -20,7 +20,6 @@ namespace Data
     int _packetID;
     Packet();
     Packet(String source, String destination, Payload *payload, int packetID, int index, int total);
-    static int getBloatLength(String source, String destination, int packetID, int index, int total);
 
   public:
     String source;
@@ -30,6 +29,6 @@ namespace Data
     int index;
     int total;
     String toJSON();
-    static std::vector<Packet *> fromPayload(Payload *payload, String source, String destination);
+    static std::vector<Packet *> fromPayload(Payload *payload, String source, String destination, RSAKeyPair *signingKey);
   };
 };

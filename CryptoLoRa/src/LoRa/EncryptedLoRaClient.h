@@ -7,7 +7,7 @@
 #include "../BackgroundTasks/BackgroundTask.h"
 using namespace Crypto;
 #include "data/Packet.h"
-#include "data/Compression.h"
+#include "data/Compressor.h"
 using namespace Data;
 #include "../logger/Logger.h"
 

@@ -1,3 +1,9 @@
+#include <miniz.h>
+#include <miniz_common.h>
+#include <miniz_export.h>
+#include <miniz_tdef.h>
+#include <miniz_tinfl.h>
+#include <miniz_zip.h>
 #include <SPI.h>
 #include <LoRa.h>
 #include <Wire.h>

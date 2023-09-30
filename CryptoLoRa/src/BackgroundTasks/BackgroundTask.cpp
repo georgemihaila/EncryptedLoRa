@@ -1,4 +1,5 @@
 #include "BackgroundTask.h"
+#include <esp32-hal.h>
 
 BackgroundTask::BackgroundTask(const char *taskName, std::function<void()> callback)
 {
@@ -17,6 +18,7 @@ void BackgroundTask::start()
                 task->_callbackFunction();
             }
             vTaskDelay(pdMS_TO_TICKS(500));
+            yield();
         } },
               _taskName, 4096, this, 1, &taskHandle);
 }
