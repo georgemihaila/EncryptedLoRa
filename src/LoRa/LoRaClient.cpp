@@ -44,6 +44,7 @@ LoRaWrapper::LoRaClient::LoRaClient(long frequency, int syncWord, SPIType spiTyp
     Serial.print(".");
     delay(1000);
   }
+  Serial.println("LoRa up");
 }
 
 void LoRaWrapper::LoRaClient::send(String message)

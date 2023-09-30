@@ -7,8 +7,8 @@ namespace Crypto
 {
   RSAKeyPair::RSAKeyPair()
   {
-    privateKey = RSA2048::genPrivateKey();
-    publicKey = RSA2048::derivatePublicKey(privateKey);
+    this->privateKey = RSA2048::genPrivateKey();
+    this->publicKey = RSA2048::derivatePublicKey(this->privateKey);
   }
 
   RSAKeyPair::RSAKeyPair(String privateKey, String publicKey)
@@ -19,11 +19,11 @@ namespace Crypto
 
   String RSAKeyPair::sign(String message)
   {
-    return RSA2048::sign(message, privateKey);
+    return RSA2048::sign(message, this->privateKey);
   }
 
   bool RSAKeyPair::verify(String message)
   {
-    return strcmp(RSA2048::verify(message, publicKey).c_str(), message.c_str()) == 0;
+    return RSA2048::verify(message, sign(message), this->publicKey);
   }
 };

@@ -13,7 +13,7 @@ namespace Crypto
   {
   public:
     static String sign(String message, String key);
-    static String verify(String message, String pubkey);
+    static bool verify(String message, String signature_base64, String pubkey);
     static String genPrivateKey();
     static String derivatePublicKey(const String &privateKey);
     static void test(Logger *logger);

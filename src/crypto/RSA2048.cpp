@@ -7,21 +7,97 @@ namespace Crypto
   String RSA2048::sign(String message, String key)
   {
     mbedtls_pk_context pk;
+    mbedtls_entropy_context entropy;
+    mbedtls_ctr_drbg_context ctr_drbg;
+
     mbedtls_pk_init(&pk);
-    mbedtls_pk_parse_key(&pk, (const unsigned char *)key.c_str(), key.length() + 1, NULL, 0);
-    mbedtls_pk_sign(&pk, MBEDTLS_MD_SHA256, (const unsigned char *)message.c_str(), message.length(), (unsigned char *)message.c_str(), (size_t *)message.length(), NULL, NULL);
+    mbedtls_entropy_init(&entropy);
+    mbedtls_ctr_drbg_init(&ctr_drbg);
+
+    // Initialize RNG
+    mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func, &entropy, (const unsigned char *)PSK, 0);
+
+    // Parse the private key
+    if (mbedtls_pk_parse_key(&pk, reinterpret_cast<const unsigned char *>(key.c_str()), key.length() + 1, NULL, 0) != 0)
+    {
+      return "Failed to parse key";
+    }
+
+    // Compute hash of message
+    unsigned char hash[32];
+    if (mbedtls_md(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), reinterpret_cast<const unsigned char *>(message.c_str()), message.length(), hash) != 0)
+    {
+      return "Failed to compute hash";
+    }
+
+    // Sign hash
+    unsigned char buf[MBEDTLS_MPI_MAX_SIZE];
+    size_t olen = 0;
+
+    if (mbedtls_pk_sign(&pk, MBEDTLS_MD_SHA256, hash, 0, buf, &olen, mbedtls_ctr_drbg_random, &ctr_drbg) != 0)
+    {
+      return "Failed to sign";
+    }
+
+    // Convert to Base64
+    // Convert to Base64
+    size_t base64_len;
+    size_t base64_max_len = 4 * ((olen + 2) / 3) + 1; // +1 for null-terminator if you plan to use it as a string
+    unsigned char *base64_output = new unsigned char[base64_max_len];
+    // Clear the buffer to zero (optional)
+    memset(base64_output, 0, base64_max_len);
+
+    int ret = mbedtls_base64_encode(base64_output, base64_max_len, &base64_len, buf, olen);
+    if (ret != 0)
+    {
+      delete[] base64_output;
+      return "Failed to encode to Base64";
+    }
+    // Cleanup
     mbedtls_pk_free(&pk);
-    return message;
+    mbedtls_ctr_drbg_free(&ctr_drbg);
+    mbedtls_entropy_free(&entropy);
+    delete[] base64_output;
+    // Return the Base64 encoded signed message
+    return String(reinterpret_cast<char *>(base64_output), base64_len);
   }
 
-  String RSA2048::verify(String message, String pubkey)
+  bool RSA2048::verify(String message, String signature_base64, String pubkey)
   {
     mbedtls_pk_context pk;
     mbedtls_pk_init(&pk);
-    mbedtls_pk_parse_public_key(&pk, (const unsigned char *)pubkey.c_str(), pubkey.length() + 1);
-    mbedtls_pk_verify(&pk, MBEDTLS_MD_SHA256, (const unsigned char *)message.c_str(), message.length(), (unsigned char *)message.c_str(), message.length());
+
+    // Parse the public key
+    if (mbedtls_pk_parse_public_key(&pk, reinterpret_cast<const unsigned char *>(pubkey.c_str()), pubkey.length() + 1) != 0)
+    {
+      return false;
+    }
+
+    // Compute hash of message
+    unsigned char hash[32];
+    if (mbedtls_md(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), reinterpret_cast<const unsigned char *>(message.c_str()), message.length(), hash) != 0)
+    {
+      return false;
+    }
+
+    // Decode Base64 signature
+    size_t sig_len;
+    unsigned char sig[MBEDTLS_MPI_MAX_SIZE];
+
+    if (mbedtls_base64_decode(sig, sizeof(sig), &sig_len, reinterpret_cast<const unsigned char *>(signature_base64.c_str()), signature_base64.length()) != 0)
+    {
+      return false;
+    }
+
+    // Verify the signature
+    if (mbedtls_pk_verify(&pk, MBEDTLS_MD_SHA256, hash, 0, sig, sig_len) != 0)
+    {
+      return false;
+    }
+
     mbedtls_pk_free(&pk);
-    return message;
+
+    return true;
   }
 
   String RSA2048::genPrivateKey()
@@ -127,8 +203,7 @@ namespace Crypto
     logger->info("Testing signature...");
     String testString = "abc123";
     String signedString = RSA2048::sign(testString, pk);
-    String verification = RSA2048::verify(signedString, pubk);
-    if (strcmp(testString.c_str(), verification.c_str()) != 0)
+    if (!RSA2048::verify(testString, signedString, pubk))
     {
       logger->info("RSA signature verification failed");
     }
@@ -138,7 +213,7 @@ namespace Crypto
     }
     logger->info("Testing invalid signature...");
     String invalidString = "abc1234";
-    if (strcmp(testString.c_str(), RSA2048::verify(RSA2048::sign(invalidString, pk), pubk).c_str()) == 0)
+    if (RSA2048::verify(invalidString, signedString, pubk))
     {
       logger->info("RSA invalid signature verification failed");
     }

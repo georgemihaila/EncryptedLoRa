@@ -6,6 +6,10 @@
 #include "Peer.h"
 #include "../BackgroundTasks/BackgroundTask.h"
 using namespace Crypto;
+#include "data/Packet.h"
+#include "data/Compression.h"
+using namespace Data;
+#include "../logger/Logger.h"
 
 #define MAX_PEERS 1
 #define MAX_MESSAGE_LENGTH 255 // 255 bytes/packet message max for LoRa
@@ -15,6 +19,7 @@ class LoRaWrapper::EncryptedLoRaClient
 private:
 #pragma region base functionality
 
+  Logger *_logger;
   EncryptedLoRaClient();
   LoRaWrapper::LoRaClient *_lora;
   bool _scanning;
@@ -36,8 +41,17 @@ private:
   BackgroundTask *_broadcastTask;
 #pragma endregion
 
+#pragma region default packets
+  std::vector<Packet *> _broadcastPackets;
+#pragma endregion
+
+  void sendPacket(Packet *packet, String peerID);
+  void sendPacketWithAck(Packet *packet, String peerID, int retries, int retryDelay);
+  void sendPacketWithAck(Packet *packet, String peerID, int retries, int retryDelay, void (*onAck)(Packet *ack));
+  void broadcastPacket(Packet *packet);
+
 public:
-  EncryptedLoRaClient(String deviceID, SPIType spiType);
+  EncryptedLoRaClient(String deviceID, SPIType spiType, Logger *logger);
   void startScanAsync(void (*onPotentialPeerFound)(Peer *potentialPeer));
   void stopScan();
   void startBroadcastingSelfAsync();

@@ -11,16 +11,16 @@ using namespace Crypto;
 
 const String _deviceID = "crooked_owl";
 TFTDisplay *_tft = new TFTDisplay();
-LoRaWrapper::EncryptedLoRaClient *_lora;
 Logger *_logger = new Logger(_tft);
+LoRaWrapper::EncryptedLoRaClient *_lora;
 
 void setup()
 {
   Serial.begin(115200);
   _logger->info("Starting...");
-  runTests();
+  // runTests();
   _logger->info("Initializing LoRa...");
-  _lora = new LoRaWrapper::EncryptedLoRaClient(_deviceID, LoRaWrapper::SPIType::CustomSPI);
+  _lora = new LoRaWrapper::EncryptedLoRaClient(_deviceID, LoRaWrapper::SPIType::CustomSPI, _logger);
   _logger->info("LoRa ok");
   _lora->startBroadcastingSelfAsync();
   _logger->info("Broadcasting...");
