@@ -1,3 +1,5 @@
+#include <ArduinoJson.h>
+#include <ArduinoJson.hpp>
 #include <miniz.h>
 #include <miniz_common.h>
 #include <miniz_export.h>

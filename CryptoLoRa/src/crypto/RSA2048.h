@@ -2,6 +2,8 @@
 
 #include "Crypto.h"
 #include "mbedtls/base64.h"
+#include "mbedtls/rsa.h"
+#include "mbedtls/pk.h"
 #include "../logger/Logger.h"
 
 #define KEY_SIZE 2048

@@ -19,13 +19,13 @@ LoRaWrapper::EncryptedLoRaClient::EncryptedLoRaClient(String deviceID, SPIType s
   _logger->info("Instantiating LoRaClient...");
   _lora = new LoRaWrapper::LoRaClient(433E6, 0x12, spiType);
   _selfID = deviceID;
-  _broadcastPackets = Packet::fromPayload(new Payload("broadcast_self", "", _selfID, _rsaKey), _selfID, "*", _rsaKey);
+  _broadcastPackets = Packet::fromPayload(new Payload("broadcast_self", "", _selfID), _selfID, "*");
   _broadcastTask = new BackgroundTask(
       "BroadcastTask", [&]()
       {
        for (int i = 0; i < _broadcastPackets.size(); i++)
        {
-        String pak= _broadcastPackets[i]->toJSON();
+        String pak = _broadcastPackets[i]->toJSON();
         _logger->info("[*]: " + pak);
          //sendPacket(pak);
        }

@@ -18,6 +18,7 @@ namespace Data
   {
   private:
     int _packetID;
+    static String _extractField(String json, String key);
     Packet();
     Packet(String source, String destination, Payload *payload, int packetID, int index, int total);
 
@@ -28,7 +29,10 @@ namespace Data
     String payloadSignature;
     int index;
     int total;
+    String toUncheckedJSON();
     String toJSON();
-    static std::vector<Packet *> fromPayload(Payload *payload, String source, String destination, RSAKeyPair *signingKey);
+    static Packet* fromCheckedJSON(String json);
+    String getChecksum();
+    static std::vector<Packet *> fromPayload(Payload *payload, String source, String destination);
   };
 };

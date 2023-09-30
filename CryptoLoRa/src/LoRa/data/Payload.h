@@ -8,19 +8,17 @@ namespace Data
 {
   class Payload
   {
-  private:
-    RSAKeyPair *_key;
-
   public:
     String action;
     String method;
     String params;
-    String getSignature();
-    Payload(RSAKeyPair *_key);
-    Payload(String action, String method, String params, RSAKeyPair *_key);
-    Payload(String action, String method, RSAKeyPair *_key);
-    Payload(String action, RSAKeyPair *_key);
+    String getChecksum();
+    Payload();
+    Payload(String action, String method, String params);
+    Payload(String action, String method);
+    Payload(String action);
     String toJSON();
-    String toUnsignedJSON();
+    String toUncheckedJSON() const;
+    static Payload *fromCheckedJSON(String json);
   };
 };
